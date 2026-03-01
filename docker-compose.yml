@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # FitFinder Application
+  fitfinder-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitfinder-app
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://fitfinder-db:5432/fitfinder
+      SPRING_DATASOURCE_USERNAME: fitfinder_user
+      SPRING_DATASOURCE_PASSWORD: fitfinder_password
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQL10Dialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      MIRAGIC_API_KEY: ${MIRAGIC_API_KEY:-}
+      MIRAGIC_BASE_URL: https://backend.miragic.ai
+      LOGGING_LEVEL_COM_FITFINDER: DEBUG
+    volumes:
+      - ./tmp:/app/tmp
+      - ./generated_outfits:/app/generated_outfits
+      - ./logs:/app/logs
+    depends_on:
+      fitfinder-db:
+        condition: service_healthy
+    networks:
+      - fitfinder-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  fitfinder-db:
+    image: postgres:15-alpine
+    container_name: fitfinder-db
+    environment:
+      POSTGRES_DB: fitfinder
+      POSTGRES_USER: fitfinder_user
+      POSTGRES_PASSWORD: fitfinder_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - fitfinder-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitfinder_user -d fitfinder"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fitfinder-network
+    restart: unless-stopped
+
+  # pgAdmin (Database Management Tool) - Optional
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: fitfinder-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@fitfinder.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - fitfinder-db
+    networks:
+      - fitfinder-network
+    restart: unless-stopped
+    profiles:
+      - with-pgadmin
+
+volumes:
+  fitfinder-db-data:
+    driver: local
+  pgadmin-data:
+    driver: local
+
+networks:
+  fitfinder-network:
+    driver: bridge
