@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend
+    participant M as Miragic AI
+    participant D as DB
+    U->>F: Upload human+cloth images
+    F->>B: POST /api/tryon/single
+    B->>M: POST /virtual-try-on
+    M-->>B: jobId
+    loop Poll 10s
+        B->>M: GET /job/{jobId}
+    end
+    M-->>B: resultImageUrl
+    B-->>F: {processedUrl}
+    F-->>U: Display result
+    B->>D: Save history

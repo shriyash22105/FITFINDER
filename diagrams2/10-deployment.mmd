@@ -1,0 +1,8 @@
+graph TD
+    C[Client Browser] --> LB[Load Balancer]
+    LB --> S1[Flask Server 1]
+    LB --> S2[Flask Server 2]
+    S1 --> DB[PostgreSQL]
+    S2 --> DB
+    S1 --> AI[Miragic Cloud]
+    S2 --> CDN[Static CDN]

@@ -1,0 +1,18 @@
+classDiagram
+    class User {
+        +int id
+        +string userid
+        +string password
+        +profile UserProfile
+    }
+    class UserProfile {
+        +string name
+        +string email
+        +string gender
+    }
+    class TryOnHistory {
+        +string resultImageUrl
+        +user User
+    }
+    User ||--o| UserProfile
+    User ||--o| TryOnHistory

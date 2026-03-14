@@ -1,0 +1,8 @@
+graph TB
+    App[FitFinder App] --> Auth[Auth Module]
+    App --> TryOn[TryOn Module]
+    App --> Outfit[Outfit Gen]
+    App --> Static[Frontend Static]
+    TryOn --> AI[Miragic API]
+    Auth --> JWT[JWT Tokens]
+    Outfit --> DB[SQLite]
