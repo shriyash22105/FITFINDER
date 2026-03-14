@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - FitFinder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #ffb5b4;
+      color: #333;
+    }
+
+    nav {
+      background: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ff8c00;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      color: #333;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #ff8c00;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 20px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #c82333;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 50px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #222;
+    }
+
+    .welcome-text {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      padding: 12px 25px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      border-radius: 25px;
+      transition: 0.3s;
+    }
+
+    .tab-btn:hover {
+      background: #fff5f0;
+      color: #ff8c00;
+    }
+
+    .tab-btn.active {
+      background: #ff8c00;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+    }
+
+    .gallery-item {
+      background: #fff5f0;
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .gallery-item h4 {
+      margin: 15px 0 5px;
+      color: #333;
+    }
+
+    .gallery-item p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .gallery-item .actions {
+      margin-top: 15px;
+    }
+
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+    }
+
+    .empty-state p {
+      margin-top: 10px;
+    }
+
+    .profile-section {
+      max-width: 500px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      transition: 0.3s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #ff8c00;
+    }
+
+    .save-btn {
+      background: #ff8c00;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      cursor: pointer;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .save-btn:hover {
+      background: #ff7000;
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: red;
+      margin: 10px 0;
+    }
+
+    .success {
+      color: green;
+      margin: 10px 0;
+    }
+
+    .not-logged-in {
+      text-align: center;
+      padding: 60px;
+    }
+
+    .not-logged-in a {
+      color: #ff8c00;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .not-logged-in a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      background: white;
+      color: #666;
+      padding: 20px;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .tabs {
+        flex-wrap: wrap;
+      }
+      
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <div class="logo">✨ FitFinder</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="outfit-generator.html">AI Generator</a></li>
+        <li><a href="tryon.html">Virtual Try-On</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="user-info" id="userInfo">
+        <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>My Dashboard</h1>
+    <p class="welcome-text">Manage your outfits, try-on history, and profile</p>
+    
+    <div id="loginWarning" class="not-logged-in" style="display:none;">
+      <p>Please <a href="login page.html">login</a> to view your dashboard.</p>
+    </div>
+
+    <div id="dashboardContent" style="display:none;">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('gallery')">My Gallery</button>
+        <button class="tab-btn" onclick="switchTab('history')">Try-On History</button>
+        <button class="tab-btn" onclick="switchTab('profile')">My Profile</button>
+      </div>
+
+      <!-- Gallery Tab -->
+      <div id="gallery-tab" class="tab-content active">
+        <h2>Saved Outfits</h2>
+        <div id="galleryGrid" class="gallery-grid"></div>
+        <div id="galleryEmpty" class="empty-state" style="display:none;">
+          <p>No saved outfits yet. Generate some outfits and save them!</p>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="history-tab" class="tab-content">
+        <h2>Try-On History</h2>
+        <div id="historyGrid" class="gallery-grid"></div>
+        <div id="historyEmpty" class="empty-state" style="display:none;">
+          <p>No try-on history yet. Try some virtual try-ons!</p>
+        </div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profile-tab" class="tab-content">
+        <h2>My Profile</h2>
+        <div class="profile-section">
+          <div class="form-group">
+            <label>UserID:</label>
+            <input type="text" id="profileUserid" readonly>
+          </div>
+          <div class="form-group">
+            <label>Name:</label>
+            <input type="text" id="profileName">
+          </div>
+          <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="profileEmail">
+          </div>
+          <div class="form-group">
+            <label>Gender:</label>
+            <select id="profileGender">
+              <option value="">Select...</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preferred Style:</label>
+            <input type="text" id="profileStyle">
+          </div>
+          <div class="form-group">
+            <label>Preferred Color:</label>
+            <input type="text" id="profileColor">
+          </div>
+          <button class="save-btn" onclick="updateProfile()">Save Profile</button>
+          <p class="error" id="profileError"></p>
+          <p class="success" id="profileSuccess"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 FitFinder | Transform your style with AI</p>
+  </footer>
+
+<script>
+  // Check authentication
+  function checkAuth() {
+    const token = localStorage.getItem('token');
+    const userid = localStorage.getItem('userid');
+    const userInfoEl = document.getElementById('userInfo');
+    
+    if (token && userid) {
+      userInfoEl.innerHTML = `
+        <span>Welcome, ${userid}</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      `;
+      document.getElementById('loginWarning').style.display = 'none';
+      document.getElementById('dashboardContent').style.display = 'block';
+      loadGallery();
+      loadHistory();
+      loadProfile();
+    } else {
+      userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+      document.getElementById('loginWarning').style.display = 'block';
+      document.getElementById('dashboardContent').style.display = 'none';
+    }
+    return token;
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userid');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('role');
+    window.location.href = 'index.html';
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    const tabIndex = ['gallery', 'history', 'profile'].indexOf(tab);
+    document.querySelectorAll('.tab-btn')[tabIndex].classList.add('active');
+    document.getElementById(tab + '-tab').classList.add('active');
+  }
+
+  async function loadGallery() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/gallery', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+
+      const galleryGrid = document.getElementById('galleryGrid');
+      const galleryEmpty = document.getElementById('galleryEmpty');
+
+      if (data.success && data.data.outfits && data.data.outfits.length > 0) {
+        galleryGrid.innerHTML = data.data.outfits.map(outfit => `
+          <div class="gallery-item">
+            <img src="${outfit.imageUrl || '/generated_outfits/' + outfit.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'150\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'150\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\'%3ENo Image%3C/text%3E%3C/svg%3E'}" alt="${outfit.outfitName}">
+            <h4>${outfit.outfitName}</h4>
+            <p>${outfit.style || ''} - ${outfit.occasion || ''}</p>
+            <div class="actions">
+              <button class="delete-btn" onclick="deleteOutfit(${outfit.id})">Delete</button>
+            </div>
+          </div>
+        `).join('');
+        galleryEmpty.style.display = 'none';
+      } else {
+        galleryGrid.innerHTML = '';
+        galleryEmpty.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error loading gallery:', error);
+    }
+  }
+
+  async function loadHistory() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/history', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+
+      const historyGrid = document.getElementById('historyGrid');
+      const historyEmpty = document.getElementById('historyEmpty');
+
+      if (data.success && data.data.history && data.data.history.length > 0) {
+        historyGrid.innerHTML = data.data.history.map(item => `
+          <div class="gallery-item">
+            <img src="${item.resultImageUrl || '/generated_outfits/' + item.resultImageUrl || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'150\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'150\'/%3E%3Ctext fill=\'%23999\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\'%3ENo Image%3C/text%3E%3C/svg%3E'}" alt="Try-on result">
+            <h4>${item.garmentType}</h4>
+            <p>${new Date(item.createdAt).toLocaleDateString()}</p>
+          </div>
+        `).join('');
+        historyEmpty.style.display = 'none';
+      } else {
+        historyGrid.innerHTML = '';
+        historyEmpty.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error loading history:', error);
+    }
+  }
+
+  async function loadProfile() {
+    const token = localStorage.getItem('token');
+    const userid = localStorage.getItem('userid');
+    if (!token) return;
+
+    document.getElementById('profileUserid').value = userid || '';
+
+    try {
+      const response = await fetch('/api/profile', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+
+      if (data.success && data.data.profile) {
+        const profile = data.data.profile;
+        document.getElementById('profileName').value = profile.name || '';
+        document.getElementById('profileEmail').value = profile.email || '';
+        document.getElementById('profileGender').value = profile.gender || '';
+        document.getElementById('profileStyle').value = profile.preferredStyle || '';
+        document.getElementById('profileColor').value = profile.preferredColor || '';
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  }
+
+  async function updateProfile() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const errorEl = document.getElementById('profileError');
+    const successEl = document.getElementById('profileSuccess');
+
+    errorEl.textContent = '';
+    successEl.textContent = '';
+
+    try {
+      const response = await fetch('/api/profile/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          name: document.getElementById('profileName').value,
+          email: document.getElementById('profileEmail').value,
+          gender: document.getElementById('profileGender').value,
+          preferredStyle: document.getElementById('profileStyle').value,
+          preferredColor: document.getElementById('profileColor').value
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        successEl.textContent = 'Profile updated successfully!';
+      } else {
+        errorEl.textContent = data.message || 'Failed to update profile';
+      }
+    } catch (error) {
+      errorEl.textContent = 'Error updating profile';
+    }
+  }
+
+  async function deleteOutfit(id) {
+    if (!confirm('Are you sure you want to delete this outfit?')) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/gallery/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        loadGallery();
+      } else {
+        alert('Failed to delete outfit');
+      }
+    } catch (error) {
+      alert('Error deleting outfit');
+    }
+  }
+
+  // Initialize
+  checkAuth();
+</script>
+</body>
+</html>

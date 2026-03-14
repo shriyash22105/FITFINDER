@@ -204,6 +204,22 @@
       font-size: 15px;
     }
 
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
     @media (max-width: 768px) {
       .nav-container {
         padding: 0 20px;
@@ -283,5 +299,45 @@
   <footer>
     <p>&copy; 2025 FitFinder | Designed with love to match your style</p>
   </footer>
+
+<script>
+  // Check authentication status and update UI
+  function checkAuth() {
+    const token = localStorage.getItem('token');
+    const userid = localStorage.getItem('userid');
+    
+    // Find or create user info element in nav
+    let userInfoEl = document.querySelector('.user-info');
+    const navUl = document.querySelector('nav ul');
+    
+    if (!userInfoEl) {
+      userInfoEl = document.createElement('div');
+      userInfoEl.className = 'user-info';
+      navUl.parentNode.insertBefore(userInfoEl, navUl.nextSibling);
+    }
+    
+    if (token && userid) {
+      userInfoEl.innerHTML = `
+        <span>Welcome, ${userid}</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      `;
+    } else {
+      userInfoEl.innerHTML = `
+        <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+      `;
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userid');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('role');
+    window.location.href = 'index.html';
+  }
+
+  // Initialize
+  checkAuth();
+</script>
 </body>
 </html>

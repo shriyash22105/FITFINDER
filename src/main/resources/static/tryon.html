@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Try-On - FitFinder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #ffb5b4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    nav {
+      background: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ff8c00;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      color: #333;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #ff8c00;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .container {
+      background-color: white;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      padding: 40px 30px;
+      text-align: center;
+      margin: 40px auto;
+      flex: 1;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 80px;
+      left: 30px;
+      background: #ff8c00;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button:hover {
+      background: #ff7000;
+      transform: translateY(-2px);
+    }
+
+    h1 {
+      color: #222;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .tab-btn {
+      padding: 12px 25px;
+      background: white;
+      border: 2px solid #e0e0e0;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 25px;
+      transition: 0.3s;
+      color: #333;
+    }
+
+    .tab-btn:hover {
+      border-color: #ff8c00;
+      background: #fff5f0;
+    }
+
+    .tab-btn.active {
+      background: #ff8c00;
+      border-color: #ff8c00;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .upload-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 30px;
+      margin-bottom: 25px;
+    }
+
+    .upload-box {
+      background: white;
+      border: 2px dashed #ff8c00;
+      border-radius: 15px;
+      width: 280px;
+      padding: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .upload-box:hover {
+      background-color: #fff5f0;
+      transform: scale(1.03);
+      border-color: #ff7000;
+    }
+
+    .upload-box h3 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .upload-box p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .upload-box input {
+      display: none;
+    }
+
+    .preview {
+      width: 100%;
+      max-height: 200px;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: none;
+      object-fit: cover;
+    }
+
+    .try-btn {
+      background: #ff8c00;
+      border: none;
+      color: white;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 20px;
+    }
+
+    .try-btn:hover {
+      transform: translateY(-3px);
+      background: #ff7000;
+      box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+    }
+
+    .try-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    #result {
+      margin-top: 40px;
+      display: none;
+    }
+
+    #result img {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .result-note {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .error {
+      color: red;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+
+    .success {
+      color: green;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+
+    .save-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 15px;
+    }
+
+    .save-btn:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      margin-top: auto;
+    }
+
+    footer p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        padding: 20px;
+      }
+      
+      .upload-section {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .upload-box {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">✨ FitFinder</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="outfit-generator.html">AI Generator</a></li>
+        <li><a href="tryon.html">Virtual Try-On</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="user-info" id="userInfo">
+        <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="index.html" class="back-button">← Back</a>
+
+    <h1>👗 Virtual Try-On</h1>
+    <p class="subtitle">Upload your photo and clothing to see your new look!</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('single')">Single Garment</button>
+      <button class="tab-btn" onclick="switchTab('combo')">Combo (Top + Bottom)</button>
+    </div>
+
+    <!-- Single Garment Tab -->
+    <div id="single-tab" class="tab-content active">
+      <div class="upload-section">
+        <div class="upload-box" onclick="document.getElementById('personInput').click()">
+          <h3>📸 Your Photo</h3>
+          <p>Click to upload</p>
+          <input type="file" id="personInput" accept="image/*">
+          <img id="personPreview" class="preview">
+        </div>
+
+        <div class="upload-box" onclick="document.getElementById('clothInput').click()">
+          <h3>👕 Clothing</h3>
+          <p>Click to upload</p>
+          <input type="file" id="clothInput" accept="image/*">
+          <img id="clothPreview" class="preview">
+        </div>
+      </div>
+
+      <button id="tryBtn" class="try-btn" onclick="tryOnSingle()">✨ Try It On</button>
+    </div>
+
+    <!-- Combo Tab -->
+    <div id="combo-tab" class="tab-content">
+      <div class="upload-section">
+        <div class="upload-box" onclick="document.getElementById('comboPersonInput').click()">
+          <h3>📸 Your Photo</h3>
+          <p>Click to upload</p>
+          <input type="file" id="comboPersonInput" accept="image/*">
+          <img id="comboPersonPreview" class="preview">
+        </div>
+
+        <div class="upload-box" onclick="document.getElementById('topClothInput').click()">
+          <h3>👔 Top</h3>
+          <p>Click to upload</p>
+          <input type="file" id="topClothInput" accept="image/*">
+          <img id="topClothPreview" class="preview">
+        </div>
+
+        <div class="upload-box" onclick="document.getElementById('bottomClothInput').click()">
+          <h3>👖 Bottom</h3>
+          <p>Click to upload</p>
+          <input type="file" id="bottomClothInput" accept="image/*">
+          <img id="bottomClothPreview" class="preview">
+        </div>
+      </div>
+
+      <button id="comboTryBtn" class="try-btn" onclick="tryOnCombo()">✨ Try Combo On</button>
+    </div>
+
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+
+    <div id="result">
+      <h3>Your Virtual Try-On Result</h3>
+      <img id="resultImage">
+      <div id="tryonNote" class="result-note"></div>
+      <button class="save-btn" onclick="saveTryOn()">💾 Save to Gallery</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>Made with ❤️ by FitFinder</p>
+  </footer>
+
+  <script>
+    // Check authentication
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const userid = localStorage.getItem('userid');
+      const userInfoEl = document.getElementById('userInfo');
+      
+      if (token && userid) {
+        userInfoEl.innerHTML = `
+          <span>Welcome, ${userid}</span>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        `;
+      } else {
+        userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+      }
+      return token;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userid');
+      localStorage.removeItem('userId');
+      window.location.href = 'index.html';
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      if (tab === 'single') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('single-tab').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('combo-tab').classList.add('active');
+      }
+    }
+
+    // Preview handlers
+    ['personInput', 'clothInput'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const imgId = id.replace('Input', 'Preview');
+            const img = document.getElementById(imgId);
+            img.src = e.target.result;
+            img.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    ['comboPersonInput', 'topClothInput', 'bottomClothInput'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const imgId = id.replace('Input', 'Preview');
+            const img = document.getElementById(imgId);
+            img.src = e.target.result;
+            img.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    let currentResultUrl = null;
+    let currentResultImage = null;
+
+async function getApiUrl(endpoint) {
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  return isMobile ? `/api/mobile/v1${endpoint}` : `/api${endpoint}`;
+}
+
+async function tryOnSingle() {
+  const personInput = document.getElementById('personInput');
+  const clothInput = document.getElementById('clothInput');
+  const btn = document.getElementById('tryBtn');
+  const errorDiv = document.getElementById('error');
+  const successDiv = document.getElementById('success');
+  const resultDiv = document.getElementById('result');
+  
+  errorDiv.textContent = '';
+  successDiv.textContent = '';
+  resultDiv.style.display = 'none';
+
+  if (!personInput.files[0] || !clothInput.files[0]) {
+    errorDiv.textContent = 'Please upload both images first!';
+    return;
+  }
+
+  // Check/refresh token
+  await refreshTokenIfNeeded();
+
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  const fd = new FormData();
+  fd.append('humanImage', personInput.files[0]);
+  fd.append('clothImage', clothInput.files[0]);
+  fd.append('garmentType', 'full_body');
+
+  try {
+    const token = localStorage.getItem('token');
+    const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+    
+    const apiUrl = await getApiUrl('/tryon/single');
+    const res = await fetch(apiUrl, { 
+      method: 'POST', 
+      body: fd,
+      headers: headers,
+      credentials: 'include'
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      const resultData = data.data || data;
+      const imageUrl = resultData.processedUrl || resultData.resultImagePath || resultData.file;
+      const imageData = resultData.image;
+          
+      if (imageUrl || imageData) {
+        if (imageData) {
+          currentResultImage = imageData;
+          document.getElementById('resultImage').src = imageData;
+        } else {
+          currentResultUrl = data.note === 'local_fallback' ? '' : '/generated_outfits/' + imageUrl;
+          document.getElementById('resultImage').src = currentResultUrl || imageData;
+        }
+        resultDiv.style.display = 'block';
+        successDiv.textContent = 'Try-on successful!';
+        
+        const noteEl = document.getElementById('tryonNote');
+        if (data.note === 'local_fallback') {
+          noteEl.textContent = 'Demo result — MIRAGIC_API_KEY not configured (local fallback)';
+        } else {
+          noteEl.textContent = data.service === 'mobile' ? 'Mobile optimized!' : '';
+        }
+        
+        // Save to history if logged in
+        if (token) {
+          await fetch(await getApiUrl('/history/save'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              humanImageUrl: '',
+              clothingImageUrl: '',
+              resultImageUrl: imageUrl || '',
+              garmentType: 'single',
+              description: 'Single garment try-on'
+            })
+          });
+        }
+      } else {
+        errorDiv.textContent = 'Error: No result image returned';
+      }
+    } else {
+      errorDiv.textContent = 'Error: ' + (data.message || 'Unknown error');
+    }
+  } catch (err) {
+    if (err.message.includes('401') || err.message.includes('token')) {
+      localStorage.removeItem('token');
+      errorDiv.textContent = 'Session expired. Please login again.';
+      window.location.href = 'login.html';
+    } else {
+      errorDiv.textContent = 'Request failed: ' + err.message;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Try It On';
+  }
+}
+
+async function refreshTokenIfNeeded() {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp * 1000 > Date.now() + 24*60*60*1000) { // >1 day left
+      return true;
+    }
+    
+    const apiUrl = await getApiUrl('/auth/refresh');
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await response.json();
+    if (data.success) {
+      localStorage.setItem('token', data.data.token);
+      console.log('Token refreshed');
+      return true;
+    }
+  } catch (e) {
+    console.error('Token refresh failed', e);
+    localStorage.removeItem('token');
+  }
+  return false;
+}
+
+    async function tryOnCombo() {
+      const personInput = document.getElementById('comboPersonInput');
+      const topInput = document.getElementById('topClothInput');
+      const bottomInput = document.getElementById('bottomClothInput');
+      const btn = document.getElementById('comboTryBtn');
+      const errorDiv = document.getElementById('error');
+      const successDiv = document.getElementById('success');
+      const resultDiv = document.getElementById('result');
+      
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+      resultDiv.style.display = 'none';
+
+      if (!personInput.files[0] || !topInput.files[0] || !bottomInput.files[0]) {
+        errorDiv.textContent = 'Please upload all three images!';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      const fd = new FormData();
+      fd.append('humanImage', personInput.files[0]);
+      fd.append('clothImage', topInput.files[0]);
+      fd.append('bottomClothImage', bottomInput.files[0]);
+      fd.append('garmentType', 'combo');
+
+      try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        
+        const res = await fetch('/api/tryon/combo', { 
+          method: 'POST', 
+          body: fd,
+          headers: headers,
+          credentials: 'include'
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          const resultData = data.data || data;
+          const imageUrl = resultData.processedUrl || resultData.resultImagePath || resultData.file;
+          const imageData = resultData.image;
+              
+          if (imageUrl || imageData) {
+            if (imageData) {
+              currentResultImage = imageData;
+              document.getElementById('resultImage').src = imageData;
+            } else {
+              currentResultUrl = '/generated_outfits/' + imageUrl;
+              document.getElementById('resultImage').src = currentResultUrl;
+            }
+            resultDiv.style.display = 'block';
+            successDiv.textContent = 'Combo try-on successful!';
+            
+            const noteEl = document.getElementById('tryonNote');
+            if (data.note === 'local_fallback') {
+              noteEl.textContent = 'Demo result — MIRAGIC_API_KEY not configured (local fallback)';
+            } else {
+              noteEl.textContent = '';
+            }
+            
+            // Save to history if logged in
+            if (token) {
+              await fetch('/api/history/save', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                  humanImageUrl: '',
+                  clothingImageUrl: '',
+                  resultImageUrl: imageUrl || '',
+                  garmentType: 'combo',
+                  description: 'Combo garment try-on'
+                })
+              });
+            }
+          } else {
+            errorDiv.textContent = 'Error: No result image returned';
+          }
+        } else {
+          errorDiv.textContent = 'Error: ' + (data.message || 'Unknown error');
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Request failed: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Try Combo On';
+      }
+    }
+
+    async function saveTryOn() {
+      if (!currentResultUrl && !currentResultImage) return;
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to save outfits');
+        window.location.href = 'login page.html';
+        return;
+      }
+
+      const successDiv = document.getElementById('success');
+      const errorDiv = document.getElementById('error');
+
+      try {
+        const response = await fetch('/api/gallery/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            outfitName: 'Try-On Result ' + new Date().toLocaleDateString(),
+            outfitDescription: 'Saved from virtual try-on',
+            imageUrl: currentResultUrl || '',
+            style: '',
+            occasion: '',
+            gender: ''
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          successDiv.textContent = 'Saved to gallery!';
+          errorDiv.textContent = '';
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Error saving: ' + error.message;
+      }
+    }
+
+    // Initialize
+    checkAuth();
+  </script>
+</body>
+</html>

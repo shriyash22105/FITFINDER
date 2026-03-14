@@ -60,6 +60,23 @@
             color: #ff8c00;
         }
 
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
         .hero {
             text-align: center;
             padding: 60px 20px;
@@ -83,7 +100,7 @@
         .generator {
             max-width: 1000px;
             margin: 0 auto 60px;
-            padding: 40px 20px;
+            padding: 40px 30px;
             background: white;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -91,7 +108,7 @@
 
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -110,7 +127,7 @@
         }
 
         .option-btn {
-            padding: 10px 20px;
+            padding: 12px 22px;
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 25px;
@@ -133,28 +150,6 @@
             color: white;
         }
 
-        .prompt-section {
-            margin: 30px 0;
-        }
-
-        .prompt-input {
-            width: 100%;
-            padding: 15px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            color: #333;
-            font-size: 16px;
-            resize: vertical;
-            min-height: 100px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .prompt-input:focus {
-            outline: none;
-            border-color: #ff8c00;
-        }
-
         .generate-btn {
             width: 100%;
             padding: 18px;
@@ -166,7 +161,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .generate-btn:hover {
@@ -182,7 +177,7 @@
         .loading {
             display: none;
             text-align: center;
-            margin: 30px 0;
+            margin: 40px 0;
         }
 
         .spinner {
@@ -204,6 +199,9 @@
             display: none;
             margin-top: 40px;
             text-align: center;
+            padding: 30px;
+            background: #fff5f0;
+            border-radius: 15px;
         }
 
         .result h2 {
@@ -211,17 +209,42 @@
             margin-bottom: 20px;
         }
 
-        .result img {
-            max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        footer {
-            text-align: center;
+        .outfit-details {
+            text-align: left;
+            margin: 20px 0;
             padding: 20px;
             background: white;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .outfit-details p {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .outfit-details strong {
+            color: #ff8c00;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .save-btn {
+            background: #28a745;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
         }
 
         .error {
@@ -232,6 +255,18 @@
             border-radius: 8px;
             margin: 20px 0;
             color: #d32f2f;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        footer p {
+            color: #666;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
@@ -260,6 +295,9 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+            <div class="user-info" id="userInfo">
+                <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+            </div>
         </div>
     </nav>
 
@@ -317,7 +355,8 @@
 
         <div class="result" id="result">
             <h2>✨ Your AI-Generated Outfit</h2>
-            <img id="resultImage" alt="Generated outfit">
+            <div class="outfit-details" id="outfitDetails"></div>
+            <button class="save-btn" id="saveBtn" onclick="saveOutfit()" style="display:none;">💾 Save to Gallery</button>
         </div>
     </div>
 
@@ -329,6 +368,31 @@
         let selectedScene = 'casual';
         let selectedStyle = 'minimalist';
         let selectedGender = 'female';
+        let currentOutfit = null;
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userid = localStorage.getItem('userid');
+            const userInfoEl = document.getElementById('userInfo');
+            
+            if (token && userid) {
+                userInfoEl.innerHTML = `
+                    <span>Welcome, ${userid}</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                `;
+            } else {
+                userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+            }
+            return token;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userid');
+            localStorage.removeItem('userId');
+            window.location.href = 'index.html';
+        }
 
         function setupOptionButtons(containerId, callback) {
             const buttons = document.querySelectorAll(`#${containerId} .option-btn`);
@@ -350,18 +414,26 @@
             const loadingDiv = document.getElementById('loading');
             const resultDiv = document.getElementById('result');
             const generateBtn = document.getElementById('generateBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            
             errorDiv.style.display = 'none';
             resultDiv.style.display = 'none';
             loadingDiv.style.display = 'block';
             generateBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/generate-outfit', {
+                const token = localStorage.getItem('token');
+                const headers = token ? { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token 
+                } : { 'Content-Type': 'application/json' };
+
+                const response = await fetch('/api/outfit/generate', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: headers,
                     body: JSON.stringify({
-                        scene: selectedScene,
                         style: selectedStyle,
+                        occasion: selectedScene,
                         gender: selectedGender
                     })
                 });
@@ -369,20 +441,79 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    document.getElementById('resultImage').src = data.image;
+                    currentOutfit = data.data.outfit;
+                    
+                    // Display outfit details
+                    const detailsDiv = document.getElementById('outfitDetails');
+                    detailsDiv.innerHTML = `
+                        <p><strong>Outfit:</strong> ${currentOutfit.outfitName}</p>
+                        <p><strong>Top:</strong> ${currentOutfit.topDescription}</p>
+                        <p><strong>Bottom:</strong> ${currentOutfit.bottomDescription}</p>
+                        <p><strong>Shoes:</strong> ${currentOutfit.shoesDescription}</p>
+                        <p><strong>Accessories:</strong> ${currentOutfit.accessoriesDescription}</p>
+                    `;
+                    
                     resultDiv.style.display = 'block';
                     resultDiv.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Show save button if logged in
+                    saveBtn.style.display = token ? 'inline-block' : 'none';
                 } else {
-                    throw new Error(data.error || 'Failed to generate outfit');
+                    throw new Error(data.message || 'Failed to generate outfit');
                 }
             } catch (error) {
-                errorDiv.textContent = `❌ Error: ${error.message}. Make sure backend is running on port 8080.`;
+                errorDiv.textContent = `❌ Error: ${error.message}. Make sure backend is running.`;
                 errorDiv.style.display = 'block';
             } finally {
                 loadingDiv.style.display = 'none';
                 generateBtn.disabled = false;
             }
         }
+
+        async function saveOutfit() {
+            if (!currentOutfit) return;
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login to save outfits');
+                window.location.href = 'login page.html';
+                return;
+            }
+
+            const errorDiv = document.getElementById('error');
+
+            try {
+                const response = await fetch('/api/gallery/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        outfitName: currentOutfit.outfitName,
+                        outfitDescription: `${currentOutfit.topDescription} + ${currentOutfit.bottomDescription}`,
+                        imageUrl: currentOutfit.imageUrl || '',
+                        style: currentOutfit.style,
+                        occasion: currentOutfit.occasion,
+                        gender: currentOutfit.gender
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Outfit saved to gallery!');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error saving outfit: ' + error.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Initialize
+        checkAuth();
     </script>
 </body>
 </html>
