@@ -8,15 +8,18 @@ import os
 import bcrypt
 from sqlalchemy import create_engine
 
-# Database URL - change this to match your PostgreSQL configuration
-# Default uses SQLite for testing, change to PostgreSQL for production
-USE_SQLITE = os.environ.get('USE_SQLITE', 'true').lower() == 'true'
+# Database URL - defaults to PostgreSQL unless USE_SQLITE=true is explicitly set
+USE_SQLITE = os.environ.get('USE_SQLITE', 'false').lower() == 'true'
 
 if USE_SQLITE:
     DB_PATH = os.path.join(os.path.dirname(__file__), 'DATABASE_SQLITE/fitfinder.db')
     DATABASE_URL = f'sqlite:///{DB_PATH}'
 else:
-    DATABASE_URL = os.environ.get('DATABASE_URL') or 'postgresql://postgres:postgres@localhost:5432/fitfinder'
+    DATABASE_URL = os.environ.get('DATABASE_URL') or 'postgresql+psycopg://postgres:postgres@localhost:5432/fitfinder'
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+    elif DATABASE_URL.startswith('postgresql://'):
+        DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+psycopg://', 1)
 
 def init_db():
     """Initialize database with all required tables"""

@@ -8,8 +8,8 @@ Set these in your hosting platform:
 - `GOOGLE_GEMINI_API_KEY` = your Gemini API key
 - `GOOGLE_GEMINI_MODEL` = `gemini-2.5-flash-lite` (optional)
 - `GOOGLE_GEMINI_API_BASE` = `https://generativelanguage.googleapis.com/v1beta/models` (optional)
-- `USE_SQLITE` = `true` (for basic deployment) or `false` when using Postgres
-- `DATABASE_URL` = Postgres URL when `USE_SQLITE=false`
+- `USE_SQLITE` = `false`
+- `DATABASE_URL` = PostgreSQL URL, e.g. `postgresql+psycopg://user:pass@host:5432/fitfinder`
 - `PORT` = auto-set by most platforms
 
 ## Option 1: Deploy with Docker (any cloud VM/container service)

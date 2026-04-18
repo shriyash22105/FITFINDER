@@ -1,41 +1,44 @@
-import sqlite3
-import sys
+import os
+from sqlalchemy import create_engine, inspect, text
 
-db_path = 'DATABASE_SQLITE/fitfinder.db'
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql+psycopg://postgres:postgres@localhost:5432/fitfinder')
+if DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+elif DATABASE_URL.startswith('postgresql://'):
+    DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+psycopg://', 1)
+
 try:
-    conn = sqlite3.connect(db_path)
-    c = conn.cursor()
-    
-    # List tables
-    c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = [row[0] for row in c.fetchall()]
+    engine = create_engine(DATABASE_URL)
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+
     print("=== FitFinder Database Tables ===")
-    print("Tables:", ', '.join(tables))
+    print("Database URL:", DATABASE_URL)
+    print("Tables:", ', '.join(tables) if tables else '(none)')
     print()
-    
-    # Count entries in main tables
+
     main_tables = ['users', 'user_profiles', 'saved_outfits', 'try_on_history', 'outfits', 'contact_messages']
     print("=== Entry Counts ===")
-    for table in main_tables:
-        if table in tables:
-            c.execute(f"SELECT COUNT(*) FROM {table}")
-            count = c.fetchone()[0]
-            print(f"{table}: {count}")
+    with engine.connect() as conn:
+        for table in main_tables:
+            if table in tables:
+                count = conn.execute(text(f'SELECT COUNT(*) FROM {table}')).scalar()
+                print(f"{table}: {count}")
+            else:
+                print(f"{table}: 0 (table missing)")
+
+        print("\n=== Sample Users (top 3) ===")
+        if 'users' in tables:
+            users = conn.execute(text('SELECT id, userid, role FROM users LIMIT 3')).fetchall()
+            if users:
+                for user in users:
+                    print(f"  ID:{user[0]} {user[1]} ({user[2]})")
+            else:
+                print("  No users found")
         else:
-            print(f"{table}: 0 (table missing)")
-    
-    # Sample data from users
-    print("\n=== Sample Users (top 3) ===")
-    c.execute("SELECT id, userid, role FROM users LIMIT 3")
-    users = c.fetchall()
-    if users:
-        for user in users:
-            print(f"  ID:{user[0]} {user[1]} ({user[2]})")
-    else:
-        print("  No users found")
-    
-    conn.close()
-    print("\n✅ Database check complete!")
+            print("  users table missing")
+
+    print("\n✅ PostgreSQL database check complete!")
 except Exception as e:
     print(f"❌ Error: {e}")
 

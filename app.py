@@ -26,13 +26,17 @@ from dotenv import load_dotenv
 # Load environment variables first!
 load_dotenv()
 
-USE_SQLITE = os.environ.get('USE_SQLITE', 'true').lower() == 'true'
+USE_SQLITE = os.environ.get('USE_SQLITE', 'false').lower() == 'true'
 
 if USE_SQLITE:
     DB_PATH = os.path.join(os.path.dirname(__file__), 'DATABASE_SQLITE/fitfinder.db')
     DB_NAME = f'sqlite:///{DB_PATH}'
 else:
-    DB_NAME = os.environ.get('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/fitfinder')
+    DB_NAME = os.environ.get('DATABASE_URL', 'postgresql+psycopg://postgres:postgres@localhost:5432/fitfinder')
+    if DB_NAME.startswith('postgres://'):
+        DB_NAME = DB_NAME.replace('postgres://', 'postgresql+psycopg://', 1)
+    elif DB_NAME.startswith('postgresql://'):
+        DB_NAME = DB_NAME.replace('postgresql://', 'postgresql+psycopg://', 1)
 SECRET_KEY = os.environ.get('SECRET_KEY', 'g8L5mK9pQ2rT7vW3xY6zA0bC4dE8fF1gH4iJ7kL0mN3oP6qR9sT2uV5wX8yZ1')
 
 if not SECRET_KEY or SECRET_KEY in ('fitfinder-secret-key-change-in-production', 'g8L5mK9pQ2rT7vW3xY6zA0bC4dE8fF1gH4iJ7kL0mN3oP6qR9sT2uV5wX8yZ1'):
