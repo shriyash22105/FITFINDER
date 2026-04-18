@@ -1,0 +1,25 @@
+stateDiagram-v2
+    direction TB
+
+    %% Object Nodes
+    state "<u>:User</u>" as U
+    state "<u>:FlaskRoute</u>" as F
+    state "<u>:AI_Service</u>" as S
+    state "<u>:SQLA_Model</u>" as M
+    state "<u>:Database</u>" as DB
+
+    %% Compact numbered interactions
+    U --> F : 1. POST / 7. JSON
+    F --> S : 2. process_images()
+    S --> S : 3. API Call
+    S --> F : 4. image_path
+    F --> M : 5. new_instance()
+    M --> DB : 6. session.commit()
+
+    %% Professional Styling
+    style U fill:#f9f9f9,stroke:#333,stroke-width:1.5px
+    style F fill:#f9f9f9,stroke:#333,stroke-width:1.5px
+    style S fill:#f9f9f9,stroke:#333,stroke-width:1.5px
+    style M fill:#f9f9f9,stroke:#333,stroke-width:1.5px
+    style DB fill:#eee,stroke:#333,stroke-width:2px
+

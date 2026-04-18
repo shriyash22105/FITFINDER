@@ -296,7 +296,7 @@
                 <li><a href="contact.html">Contact</a></li>
             </ul>
             <div class="user-info" id="userInfo">
-                <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+                <a href="login.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
             </div>
         </div>
     </nav>
@@ -382,7 +382,7 @@
                     <button class="logout-btn" onclick="logout()">Logout</button>
                 `;
             } else {
-                userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+                userInfoEl.innerHTML = `<a href="login.html">Login</a>`;
             }
             return token;
         }
@@ -476,7 +476,7 @@
             const token = localStorage.getItem('token');
             if (!token) {
                 alert('Please login to save outfits');
-                window.location.href = 'login page.html';
+                window.location.href = 'login.html';
                 return;
             }
 

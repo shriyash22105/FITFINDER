@@ -1,0 +1,60 @@
+flowchart TB
+    subgraph Actors["Actors"]
+        Visitor((👤 Visitor))
+        User((🧑‍💼 Authenticated User))
+        Admin((👨‍💼 Admin))
+    end
+    
+    subgraph PublicUseCases["Public Use Cases"]
+        Visit["🌐 Visit Website"]
+        Demo["📱 View Demo/Videos"]
+        Register["🔐 Register Account"]
+        Login["🔐 Login"]
+        Contact["📧 Contact Form"]
+    end
+    
+    subgraph AuthenticatedUseCases["Authenticated Use Cases"]
+        TryonSingle["🧥 Virtual Try-On (Single)"]
+        TryonCombo["🧥 Virtual Try-On (Combo)"]
+        OutfitGen["✨ AI Outfit Generator"]
+        GalleryView["🖼️ Gallery & History"]
+        ProfileUpdate["👤 Update Profile"]
+        SaveHistory["💾 Save to History"]
+        SaveGallery["⭐ Save to Gallery"]
+    end
+    
+    subgraph AdminUseCases["Admin Use Cases"]
+        ManageUsers["👥 Manage Users"]
+        ViewMessages["📨 View Contact Messages"]
+    end
+    
+    %% Flows
+    Visitor --> Visit
+    Visitor --> Demo
+    Visitor --> Register
+    Visitor --> Login
+    Visitor --> Contact
+    
+    User --> Login
+    User --> TryonSingle
+    User --> TryonCombo
+    User --> OutfitGen
+    User --> GalleryView
+    User --> ProfileUpdate
+    
+    Admin --> Login
+    Admin --> ManageUsers
+    Admin --> ViewMessages
+    
+    %% Extensions
+    TryonSingle -.->|Save| SaveHistory
+    TryonCombo -.->|Save| SaveHistory
+    OutfitGen -.->|Save| SaveGallery
+    GalleryView -.->|Delete| SaveGallery
+    
+    classDef visitor stroke:#f66
+    classDef user stroke:#6f6
+    classDef admin stroke:#66f
+    class Visitor visitor
+    class User user
+    class Admin admin

@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant User
+    participant Frontend as HTML Frontend
+    participant Backend as Flask Backend
+    participant Miragic as Miragic AI API
+    participant DB as PostgreSQL
+    
+    User->>Frontend: Upload human+cloth images
+    Frontend->>Backend: POST /api/tryon/single<br/>{humanImage, clothImage}
+    Backend->>Miragic: POST /virtual-try-on<br/>X-API-Key + files
+    Miragic-->>Backend: {jobId}
+    Backend->>Backend: Poll /virtual-try-on/{jobId}
+    alt Job COMPLETED
+        Miragic-->>Backend: {status: COMPLETED, processedUrl}
+        Backend->>DB: INSERT try_on_history
+        Backend-->>Frontend: {success:true, processedUrl}
+        Frontend->>User: Display result image
+    else FAILED/TIMEOUT
+        Backend-->>Frontend: {success:false, error}
+        Frontend->>User: Error message
+    end
+    
+    Note over Backend,Miragic: Polling every 2s, timeout 60s<br/>Fallback: Local image overlay
+

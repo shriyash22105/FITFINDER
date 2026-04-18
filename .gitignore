@@ -34,6 +34,12 @@ temp/
 # Generated images
 generated_outfits/
 
+# Environment variables
+.env
+
+# Virtual environment
+.venv/
+
 # Maven
 pom.xml.tag
 pom.xml.releaseBackup

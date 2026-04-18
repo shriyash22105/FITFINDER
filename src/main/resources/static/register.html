@@ -120,7 +120,7 @@
       <button class="register-btn" id="registerBtn">Create Account</button>
       <p class="error" id="error"></p>
       <p class="success" id="success"></p>
-      <p class="login-link">Already have an account? <a href="login page.html">Login here</a></p>
+      <p class="login-link">Already have an account? <a href="login.html">Login here</a></p>
     </div>
 
     <div class="image-section"></div>
@@ -174,7 +174,7 @@
         successEl.textContent = 'Account created! Redirecting to login...';
         successEl.style.display = 'block';
         setTimeout(() => {
-          window.location.href = 'login page.html';
+          window.location.href = 'login.html';
         }, 1500);
       } else {
         errorEl.textContent = data.message || 'Registration failed';

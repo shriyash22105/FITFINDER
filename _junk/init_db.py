@@ -4,8 +4,7 @@ Creates all tables in PostgreSQL/SQLite database based on ER diagram
 """
 
 import os
-# from passlib.hash import bcrypt
-import bcrypt
+from passlib.hash import bcrypt
 from sqlalchemy import create_engine
 
 # Database URL - change this to match your PostgreSQL configuration
@@ -13,7 +12,7 @@ from sqlalchemy import create_engine
 USE_SQLITE = os.environ.get('USE_SQLITE', 'true').lower() == 'true'
 
 if USE_SQLITE:
-    DB_PATH = os.path.join(os.path.dirname(__file__), 'DATABASE_SQLITE/fitfinder.db')
+    DB_PATH = os.path.join(os.path.dirname(__file__), 'fitfinder.db')
     DATABASE_URL = f'sqlite:///{DB_PATH}'
 else:
     DATABASE_URL = os.environ.get('DATABASE_URL') or 'postgresql://postgres:postgres@localhost:5432/fitfinder'
@@ -35,7 +34,6 @@ def init_db():
         userid = Column(String(50), unique=True, nullable=False)
         password = Column(String(255), nullable=False)
         role = Column(String(20), default='USER')
-        created_at = Column(DateTime, default=datetime.utcnow)
 
     class UserProfile(Base):
         __tablename__ = 'user_profiles'

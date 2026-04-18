@@ -1,0 +1,95 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}, 'classDiagram': {'nodeSpacing': 50, 'rankSpacing': 60}}}%%
+classDiagram
+    class User {
+        +int id PK
+        +str userid UK
+        +str password
+        +str role
+        +list profile
+        +list try_on_histories
+        +list saved_outfits
+        +list outfits
+    }
+    
+    class UserProfile {
+        +int id PK
+        +int user_id FK
+        +str name
+        +str email
+        +str avatar
+        +str gender
+        +str preferred_style
+        +str preferred_color
+        +datetime created_at
+        +datetime updated_at
+    }
+    
+    class TryOnHistory {
+        +int id PK
+        +int user_id FK
+        +str human_image_url
+        +str clothing_image_url
+        +str result_image_url
+        +str garment_type
+        +str outfit_description
+        +datetime created_at
+    }
+    
+    class SavedOutfit {
+        +int id PK
+        +int user_id FK
+        +str outfit_name
+        +str outfit_description
+        +str image_url
+        +str style
+        +str occasion
+        +str gender
+        +datetime created_at
+    }
+    
+    class Outfit {
+        +int id PK
+        +int user_id FK
+        +str outfit_name
+        +str style
+        +str occasion
+        +str season
+        +str gender
+        +str color_preference
+        +str top_description
+        +str bottom_description
+        +str shoes_description
+        +str accessories_description
+        +str image_url
+        +bool is_ai_generated
+        +datetime created_at
+    }
+    
+    class ContactMessage {
+        +int id PK
+        +str name
+        +str email
+        +str message
+        +bool is_read
+        +datetime created_at
+    }
+    
+    %% Relationships
+    User ||--|| UserProfile : has
+    User ||--o{ TryOnHistory : generates
+    User ||--o{ SavedOutfit : saves
+    User ||--o{ Outfit : creates
+    
+    %% Services
+    class FlaskApp {
+        +@app.route()
+        +token_required()
+    }
+    
+    class MiragicAPI {
+        +POST /virtual-try-on
+        +GET /job-status
+    }
+    
+    FlaskApp ..> User : uses
+    FlaskApp ..> MiragicAPI : calls

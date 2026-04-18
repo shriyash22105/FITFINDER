@@ -302,6 +302,22 @@
         grid-template-columns: 1fr;
       }
     }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
   </style>
 </head>
 <body>
@@ -316,7 +332,7 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="user-info" id="userInfo">
-        <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+        <a href="login.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
       </div>
     </div>
   </nav>
@@ -326,7 +342,7 @@
     <p class="welcome-text">Manage your outfits, try-on history, and profile</p>
     
     <div id="loginWarning" class="not-logged-in" style="display:none;">
-      <p>Please <a href="login page.html">login</a> to view your dashboard.</p>
+      <p>Please <a href="login.html">login</a> to view your dashboard.</p>
     </div>
 
     <div id="dashboardContent" style="display:none;">
@@ -404,6 +420,7 @@
   function checkAuth() {
     const token = localStorage.getItem('token');
     const userid = localStorage.getItem('userid');
+    const role = localStorage.getItem('role');
     const userInfoEl = document.getElementById('userInfo');
     
     if (token && userid) {
@@ -416,8 +433,12 @@
       loadGallery();
       loadHistory();
       loadProfile();
+      
+      if (role === 'ADMIN') {
+        addAdminPanel();
+      }
     } else {
-      userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+      userInfoEl.innerHTML = `<a href="login.html">Login</a>`;
       document.getElementById('loginWarning').style.display = 'block';
       document.getElementById('dashboardContent').style.display = 'none';
     }
@@ -436,9 +457,10 @@
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    const tabIndex = ['gallery', 'history', 'profile'].indexOf(tab);
-    document.querySelectorAll('.tab-btn')[tabIndex].classList.add('active');
-    document.getElementById(tab + '-tab').classList.add('active');
+    const btn = document.querySelector(`[onclick="switchTab('${tab}')"]`);
+    if (btn) btn.classList.add('active');
+    const content = document.getElementById(tab + '-tab');
+    if (content) content.classList.add('active');
   }
 
   async function loadGallery() {
@@ -596,6 +618,103 @@
 
   // Initialize
   checkAuth();
+
+  function addAdminPanel() {
+    const tabs = document.querySelector('.tabs');
+    tabs.innerHTML += '<button class="tab-btn" onclick="switchTab(\'admin\')">Admin Panel</button>';
+    
+    const dashboardContent = document.getElementById('dashboardContent');
+    dashboardContent.innerHTML += `
+      <div id="admin-tab" class="tab-content">
+        <h2>Admin Panel</h2>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchAdminTab('users')">Users</button>
+          <button class="tab-btn" onclick="switchAdminTab('outfits')">Outfits</button>
+          <button class="tab-btn" onclick="switchAdminTab('history')">History</button>
+        </div>
+        <div id="admin-users" class="tab-content active">
+          <h3>Users</h3>
+          <div id="usersList"></div>
+        </div>
+        <div id="admin-outfits" class="tab-content">
+          <h3>Outfits</h3>
+          <div id="outfitsList"></div>
+        </div>
+        <div id="admin-history" class="tab-content">
+          <h3>History</h3>
+          <div id="historyList"></div>
+        </div>
+      </div>
+    `;
+    loadAdminData();
+  }
+
+  function switchAdminTab(tab) {
+    document.querySelectorAll('#admin-tab .tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('#admin-tab .tab-content').forEach(content => content.classList.remove('active'));
+    
+    const btn = document.querySelector(`[onclick="switchAdminTab('${tab}')"]`);
+    if (btn) btn.classList.add('active');
+    const content = document.getElementById('admin-' + tab);
+    if (content) content.classList.add('active');
+  }
+
+  async function loadAdminData() {
+    loadUsers();
+    loadOutfits();
+    loadAdminHistory();
+  }
+
+  async function loadUsers() {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('/api/admin/users', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+      if (data.success) {
+        const usersList = document.getElementById('usersList');
+        usersList.innerHTML = '<table><tr><th>ID</th><th>UserID</th><th>Role</th><th>Name</th><th>Email</th><th>Created</th></tr>' + 
+          data.data.users.map(u => `<tr><td>${u.id}</td><td>${u.userid}</td><td>${u.role}</td><td>${u.name}</td><td>${u.email}</td><td>${u.created_at}</td></tr>`).join('') + '</table>';
+      }
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  }
+
+  async function loadOutfits() {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('/api/admin/outfits', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+      if (data.success) {
+        const outfitsList = document.getElementById('outfitsList');
+        outfitsList.innerHTML = '<table><tr><th>ID</th><th>User ID</th><th>Name</th><th>Style</th><th>Occasion</th><th>Gender</th><th>Season</th><th>Created</th></tr>' + 
+          data.data.outfits.map(o => `<tr><td>${o.id}</td><td>${o.user_id}</td><td>${o.outfit_name}</td><td>${o.style}</td><td>${o.occasion}</td><td>${o.gender}</td><td>${o.season}</td><td>${o.created_at}</td></tr>`).join('') + '</table>';
+      }
+    } catch (error) {
+      console.error('Error loading outfits:', error);
+    }
+  }
+
+  async function loadAdminHistory() {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('/api/admin/history', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await response.json();
+      if (data.success) {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '<table><tr><th>ID</th><th>User ID</th><th>Garment Type</th><th>Result URL</th><th>Created</th></tr>' + 
+          data.data.history.map(h => `<tr><td>${h.id}</td><td>${h.user_id}</td><td>${h.garment_type}</td><td>${h.result_image_url}</td><td>${h.created_at}</td></tr>`).join('') + '</table>';
+      }
+    } catch (error) {
+      console.error('Error loading history:', error);
+    }
+  }
 </script>
 </body>
 </html>

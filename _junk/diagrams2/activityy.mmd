@@ -1,0 +1,40 @@
+graph LR
+    Start((👤 Start)) --> IsLogged{Logged In?}
+    
+    IsLogged -- No --> Landing[🌐 Landing]
+    Landing --> RegLogin[🔐 Register/Login]
+    RegLogin --> JWT["🔑 JWT Token"] --> Dash[📊 Dashboard]
+    
+    IsLogged -- Yes --> Dash
+    
+    subgraph Menu ["Dashboard Options"]
+    Dash --> Tryon["🧥 Try-On"]
+    Dash --> Outfit["✨ Outfit Gen"]
+    Dash --> Gallery["🖼️ Gallery"]
+    Dash --> Profile["👤 Profile"]
+    Dash --> Contact["📧 Contact"]
+    Dash --> Logout["🚪 Logout → End"]
+    end
+    
+    Tryon --> Upload[📸 Images] --> Type{Try Type?}
+    Type --> Single["Single Item"] --> API1["🚀 /tryon API"]
+    Type --> Combo["Combo"] --> API1
+    API1 --> Poll["🔄 Poll AI"] --> Result["✅ Result"] --> SaveT{Save?}
+    
+    Outfit --> Style[🎨 Style] --> Occ[🎉 Occasion] --> API2["🚀 /outfit API"] --> SaveO{Save?}
+    
+    Gallery --> List[📜 List] --> Del{Delete?} -->|Yes| DelAPI["🗑️ Delete"]
+    
+    Profile --> Edit[✏️ Edit] --> Update["💾 Update API"]
+    
+    Contact --> Submit["📤 Submit"]
+    
+    SaveT -->|Yes| DB["💾 DB"]
+    SaveO -->|Yes| DB
+    DelAPI --> Gallery
+    Update --> Dash
+    Submit --> Dash
+    DB --> Dash
+    
+    classDef api fill:#9C27B0,stroke:#7B1FA2
+    class API1,API2,DelAPI,Update api

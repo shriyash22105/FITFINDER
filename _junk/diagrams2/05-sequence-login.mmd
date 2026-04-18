@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant User
+    participant Frontend as Frontend
+    participant Backend as Flask Backend
+    participant DB as PostgreSQL
+    participant JWT
+    
+    User->>Frontend: Enter userid/password
+    Frontend->>Backend: POST /api/auth/login {userid, password}
+    Backend->>DB: SELECT * FROM users WHERE userid=?
+    alt Valid credentials
+        DB-->>Backend: User record
+        Backend->>JWT: Generate JWT token
+        JWT-->>Backend: Signed token
+        Backend-->>Frontend: {success:true, token, userId}
+        Frontend->>User: Login success
+    else Invalid
+        DB-->>Backend: No user or wrong password
+        Backend-->>Frontend: {success:false, message:'Invalid credentials'}
+        Frontend->>User: Error message
+    end
+    Note right of Backend: bcrypt password check + JWT with 7-day expiry
+

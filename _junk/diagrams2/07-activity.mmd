@@ -1,0 +1,55 @@
+flowchart TD
+    Start((👤 Start)) --> Landing[🌐 Landing Page]
+    
+    Landing --> Choose{Choose Action?}
+    Choose -->|Register| RegForm[📝 Registration Form]
+    RegForm --> SubmitReg[📤 Submit Registration]
+    SubmitReg --> VerifyReg{Valid Email/Password?}
+    VerifyReg -->|No| RegForm
+    VerifyReg -->|Yes| UserCreated[✅ User Created]
+    UserCreated --> LoginForm[🔐 Login Form]
+    
+    Choose -->|Login| LoginForm
+    LoginForm --> SubmitLogin[📤 Submit Login]
+    SubmitLogin --> AuthUser{Auth Valid?}
+    AuthUser -->|No| LoginForm
+    AuthUser -->|Yes| JWTToken["🔑 Generate JWT"]
+    JWTToken --> Dashboard[📊 Dashboard]
+    
+    Dashboard --> TryOnBtn["🧥 Try-On Clothes"]
+    Dashboard --> AIOutfit["🤖 AI Outfit Generator"]
+    Dashboard --> MyGallery["🖼️ My Gallery"]
+    Dashboard --> UserProfile["👤 User Profile"]
+    Dashboard --> ContactUs["📧 Contact Us"]
+    Dashboard --> LogOut["🚪 Logout → End((🏁 End))"]
+    
+    TryOnBtn --> UploadImages["📸 Upload Human/Clothing Images"]
+    UploadImages --> ProcessAI["🤖 Miragic AI Processing"]
+    ProcessAI --> PollStatus["🔄 Poll /status"]
+    PollStatus -->|Complete| TryOnResult["✅ Try-On Result"]
+    TryOnResult --> SaveHistory{Save to History?}
+    
+    AIOutfit --> SelectStyle["🎨 Select Style/Occasion/Gender"]
+    SelectStyle --> GenerateOutfit["🚀 /generate_outfit API"]
+    GenerateOutfit --> AIOutfitResult["✨ AI Outfit Generated"]
+    AIOutfitResult --> SaveGallery{Save to Gallery?}
+    
+    MyGallery --> ViewOutfits["📜 List Saved Outfits"]
+    ViewOutfits --> DeleteOutfit{Delete?}
+    
+    UserProfile --> EditProfile["✏️ Edit Name/Avatar/Gender"]
+    EditProfile --> UpdateAPI["💾 PUT /profile"]
+    
+    ContactUs --> ContactForm["📝 Contact Form"]
+    ContactForm --> SubmitContact["📤 POST /contact"]
+    
+    SaveHistory -->|Yes| DBHist["💾 Save TryOnHistory"] --> Dashboard
+    SaveGallery -->|Yes| DBSave["💾 Save SavedOutfit"] --> Dashboard
+    DeleteOutfit -->|Yes| DeleteAPI["🗑️ DELETE /gallery/{id}"] --> MyGallery
+    UpdateAPI --> ProfileSaved["✅ Profile Updated"] --> Dashboard
+    SubmitContact --> ContactSaved["✅ Message Sent"] --> Dashboard
+    classDef apiCall fill:#9C27B0,stroke:#7B1FA2,stroke-width:2px
+    classDef dbCall fill:#4CAF50,stroke:#388E3C,stroke-width:2px
+    class GenerateOutfit,DeleteAPI,UpdateAPI,SubmitContact apiCall
+    class DBHist,DBSave dbCall
+

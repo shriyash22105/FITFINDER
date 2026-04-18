@@ -1,0 +1,30 @@
+graph LR
+    Client["👤 User Device<br/>🌐 Web Browser"] 
+    LoadBalancer["☁️ Railway Load Balancer"]
+    
+    subgraph Server["🚀 Railway Deployment"]
+        App["🐳 Docker Container<br/>⚙️ Gunicorn + Flask<br/>📁 app.py + static"]
+        Nginx["🔒 Nginx Reverse Proxy"]
+    end
+    
+    DB["🗄️ PostgreSQL<br/>Managed Service"]
+    
+    AI["🤖 Miragic AI<br/>External API"]
+    
+    Client -.->|"HTTPS 443"| LoadBalancer
+    LoadBalancer --> Nginx
+    Nginx --> App
+    
+    App -.->|"psycopg2 SQL"| DB
+    App -.->|"HTTP POST"| AI
+    
+    classDef cloud fill:#E3F2FD
+    classDef app fill:#F3E5F5
+    classDef db fill:#E8F5E8
+    classDef ai fill:#FFF3E0
+    
+    class LoadBalancer,Server,DB cloud
+    class App,Nginx app
+    class DB db
+    class AI ai
+

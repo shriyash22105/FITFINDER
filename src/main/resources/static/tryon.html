@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -244,7 +245,7 @@
       width: 100%;
       max-width: 500px;
       border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     }
 
     .result-note {
@@ -300,18 +301,19 @@
         width: 95%;
         padding: 20px;
       }
-      
+
       .upload-section {
         flex-direction: column;
         align-items: center;
       }
-      
+
       .upload-box {
         width: 100%;
       }
     }
   </style>
 </head>
+
 <body>
 
   <nav>
@@ -325,7 +327,7 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="user-info" id="userInfo">
-        <a href="login page.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
+        <a href="login.html" style="color:#333;text-decoration:none;font-weight:600;">Login</a>
       </div>
     </div>
   </nav>
@@ -411,14 +413,14 @@
       const token = localStorage.getItem('token');
       const userid = localStorage.getItem('userid');
       const userInfoEl = document.getElementById('userInfo');
-      
+
       if (token && userid) {
         userInfoEl.innerHTML = `
           <span>Welcome, ${userid}</span>
           <button class="logout-btn" onclick="logout()">Logout</button>
         `;
       } else {
-        userInfoEl.innerHTML = `<a href="login page.html">Login</a>`;
+        userInfoEl.innerHTML = `<a href="login.html">Login</a>`;
       }
       return token;
     }
@@ -433,7 +435,7 @@
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
+
       if (tab === 'single') {
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
         document.getElementById('single-tab').classList.add('active');
@@ -445,11 +447,11 @@
 
     // Preview handlers
     ['personInput', 'clothInput'].forEach(id => {
-      document.getElementById(id).addEventListener('change', function(event) {
+      document.getElementById(id).addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = function(e) {
+          reader.onload = function (e) {
             const imgId = id.replace('Input', 'Preview');
             const img = document.getElementById(imgId);
             img.src = e.target.result;
@@ -461,11 +463,11 @@
     });
 
     ['comboPersonInput', 'topClothInput', 'bottomClothInput'].forEach(id => {
-      document.getElementById(id).addEventListener('change', function(event) {
+      document.getElementById(id).addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = function(e) {
+          reader.onload = function (e) {
             const imgId = id.replace('Input', 'Preview');
             const img = document.getElementById(imgId);
             img.src = e.target.result;
@@ -479,143 +481,144 @@
     let currentResultUrl = null;
     let currentResultImage = null;
 
-async function getApiUrl(endpoint) {
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  return isMobile ? `/api/mobile/v1${endpoint}` : `/api${endpoint}`;
-}
+    async function getApiUrl(endpoint) {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      return isMobile ? `/api/mobile/v1${endpoint}` : `/api${endpoint}`;
+    }
 
-async function tryOnSingle() {
-  const personInput = document.getElementById('personInput');
-  const clothInput = document.getElementById('clothInput');
-  const btn = document.getElementById('tryBtn');
-  const errorDiv = document.getElementById('error');
-  const successDiv = document.getElementById('success');
-  const resultDiv = document.getElementById('result');
-  
-  errorDiv.textContent = '';
-  successDiv.textContent = '';
-  resultDiv.style.display = 'none';
+    async function tryOnSingle() {
+      const personInput = document.getElementById('personInput');
+      const clothInput = document.getElementById('clothInput');
+      const btn = document.getElementById('tryBtn');
+      const errorDiv = document.getElementById('error');
+      const successDiv = document.getElementById('success');
+      const resultDiv = document.getElementById('result');
 
-  if (!personInput.files[0] || !clothInput.files[0]) {
-    errorDiv.textContent = 'Please upload both images first!';
-    return;
-  }
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+      resultDiv.style.display = 'none';
 
-  // Check/refresh token
-  await refreshTokenIfNeeded();
-
-  btn.disabled = true;
-  btn.textContent = 'Processing...';
-
-  const fd = new FormData();
-  fd.append('humanImage', personInput.files[0]);
-  fd.append('clothImage', clothInput.files[0]);
-  fd.append('garmentType', 'full_body');
-
-  try {
-    const token = localStorage.getItem('token');
-    const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-    
-    const apiUrl = await getApiUrl('/tryon/single');
-    const res = await fetch(apiUrl, { 
-      method: 'POST', 
-      body: fd,
-      headers: headers,
-      credentials: 'include'
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      const resultData = data.data || data;
-      const imageUrl = resultData.processedUrl || resultData.resultImagePath || resultData.file;
-      const imageData = resultData.image;
-          
-      if (imageUrl || imageData) {
-        if (imageData) {
-          currentResultImage = imageData;
-          document.getElementById('resultImage').src = imageData;
-        } else {
-          currentResultUrl = data.note === 'local_fallback' ? '' : '/generated_outfits/' + imageUrl;
-          document.getElementById('resultImage').src = currentResultUrl || imageData;
-        }
-        resultDiv.style.display = 'block';
-        successDiv.textContent = 'Try-on successful!';
-        
-        const noteEl = document.getElementById('tryonNote');
-        if (data.note === 'local_fallback') {
-          noteEl.textContent = 'Demo result — MIRAGIC_API_KEY not configured (local fallback)';
-        } else {
-          noteEl.textContent = data.service === 'mobile' ? 'Mobile optimized!' : '';
-        }
-        
-        // Save to history if logged in
-        if (token) {
-          await fetch(await getApiUrl('/history/save'), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({
-              humanImageUrl: '',
-              clothingImageUrl: '',
-              resultImageUrl: imageUrl || '',
-              garmentType: 'single',
-              description: 'Single garment try-on'
-            })
-          });
-        }
-      } else {
-        errorDiv.textContent = 'Error: No result image returned';
+      if (!personInput.files[0] || !clothInput.files[0]) {
+        errorDiv.textContent = 'Please upload both images first!';
+        return;
       }
-    } else {
-      errorDiv.textContent = 'Error: ' + (data.message || 'Unknown error');
-    }
-  } catch (err) {
-    if (err.message.includes('401') || err.message.includes('token')) {
-      localStorage.removeItem('token');
-      errorDiv.textContent = 'Session expired. Please login again.';
-      window.location.href = 'login.html';
-    } else {
-      errorDiv.textContent = 'Request failed: ' + err.message;
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '✨ Try It On';
-  }
-}
 
-async function refreshTokenIfNeeded() {
-  const token = localStorage.getItem('token');
-  if (!token) return false;
-  
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    if (payload.exp * 1000 > Date.now() + 24*60*60*1000) { // >1 day left
-      return true;
-    }
-    
-    const apiUrl = await getApiUrl('/auth/refresh');
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+      // Check/refresh token
+      await refreshTokenIfNeeded();
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      const fd = new FormData();
+      fd.append('humanImage', personInput.files[0]);
+      fd.append('clothImage', clothInput.files[0]);
+      fd.append('garmentType', 'full_body');
+
+      try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
+        const apiUrl = await getApiUrl('/tryon/single');
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          body: fd,
+          headers: headers,
+          credentials: 'include'
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          const resultData = data.data || data;
+          const imageUrl = resultData.processedUrl || resultData.resultImagePath || resultData.file;
+          const imageData = resultData.image;
+
+          if (imageUrl || imageData) {
+            if (imageData) {
+              currentResultImage = imageData;
+              document.getElementById('resultImage').src = imageData;
+            } else {
+              currentResultUrl = data.note === 'local_fallback' ? '' : '/generated_outfits/' + imageUrl;
+              document.getElementById('resultImage').src = currentResultUrl || imageData;
+            }
+            resultDiv.style.display = 'block';
+            successDiv.textContent = 'Try-on successful!';
+
+            const noteEl = document.getElementById('tryonNote');
+            if (data.note === 'local_fallback') {
+              noteEl.textContent = 'Demo result — MIRAGIC_API_KEY not configured (local fallback)';
+            } else {
+              noteEl.textContent = data.service === 'mobile' ? 'Mobile optimized!' : '';
+            }
+
+            // Save to history if logged in
+            if (token) {
+              await fetch(await getApiUrl('/history/save'), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                  humanImageUrl: '',
+                  clothingImageUrl: '',
+                  resultImageUrl: imageUrl || '',
+                  garmentType: 'single',
+                  description: 'Single garment try-on'
+                })
+              });
+            }
+          } else {
+            errorDiv.textContent = 'Error: No result image returned';
+          }
+        } else {
+          errorDiv.textContent = 'Error: ' + (data.error || data.message || 'Unknown error');
+          if (data.details) console.error(data.details);
+        }
+      } catch (err) {
+        if (err.message.includes('401') || err.message.includes('token')) {
+          localStorage.removeItem('token');
+          errorDiv.textContent = 'Session expired. Please login again.';
+          window.location.href = 'login.html';
+        } else {
+          errorDiv.textContent = 'Request failed: ' + err.message;
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Try It On';
       }
-    });
-    const data = await response.json();
-    if (data.success) {
-      localStorage.setItem('token', data.data.token);
-      console.log('Token refreshed');
-      return true;
     }
-  } catch (e) {
-    console.error('Token refresh failed', e);
-    localStorage.removeItem('token');
-  }
-  return false;
-}
+
+    async function refreshTokenIfNeeded() {
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp * 1000 > Date.now() + 24 * 60 * 60 * 1000) { // >1 day left
+          return true;
+        }
+
+        const apiUrl = await getApiUrl('/auth/refresh');
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if (data.success) {
+          localStorage.setItem('token', data.data.token);
+          console.log('Token refreshed');
+          return true;
+        }
+      } catch (e) {
+        console.error('Token refresh failed', e);
+        localStorage.removeItem('token');
+      }
+      return false;
+    }
 
     async function tryOnCombo() {
       const personInput = document.getElementById('comboPersonInput');
@@ -625,7 +628,7 @@ async function refreshTokenIfNeeded() {
       const errorDiv = document.getElementById('error');
       const successDiv = document.getElementById('success');
       const resultDiv = document.getElementById('result');
-      
+
       errorDiv.textContent = '';
       successDiv.textContent = '';
       resultDiv.style.display = 'none';
@@ -647,21 +650,21 @@ async function refreshTokenIfNeeded() {
       try {
         const token = localStorage.getItem('token');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-        
-        const res = await fetch('/api/tryon/combo', { 
-          method: 'POST', 
+
+        const res = await fetch('/api/tryon/combo', {
+          method: 'POST',
           body: fd,
           headers: headers,
           credentials: 'include'
         });
-        
+
         const data = await res.json();
-        
+
         if (data.success) {
           const resultData = data.data || data;
           const imageUrl = resultData.processedUrl || resultData.resultImagePath || resultData.file;
           const imageData = resultData.image;
-              
+
           if (imageUrl || imageData) {
             if (imageData) {
               currentResultImage = imageData;
@@ -672,14 +675,14 @@ async function refreshTokenIfNeeded() {
             }
             resultDiv.style.display = 'block';
             successDiv.textContent = 'Combo try-on successful!';
-            
+
             const noteEl = document.getElementById('tryonNote');
             if (data.note === 'local_fallback') {
               noteEl.textContent = 'Demo result — MIRAGIC_API_KEY not configured (local fallback)';
             } else {
               noteEl.textContent = '';
             }
-            
+
             // Save to history if logged in
             if (token) {
               await fetch('/api/history/save', {
@@ -701,7 +704,8 @@ async function refreshTokenIfNeeded() {
             errorDiv.textContent = 'Error: No result image returned';
           }
         } else {
-          errorDiv.textContent = 'Error: ' + (data.message || 'Unknown error');
+          errorDiv.textContent = 'Error: ' + (data.error || data.message || 'Unknown error');
+          if (data.details) console.error(data.details);
         }
       } catch (err) {
         errorDiv.textContent = 'Request failed: ' + err.message;
@@ -713,11 +717,11 @@ async function refreshTokenIfNeeded() {
 
     async function saveTryOn() {
       if (!currentResultUrl && !currentResultImage) return;
-      
+
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please login to save outfits');
-        window.location.href = 'login page.html';
+        window.location.href = 'login.html';
         return;
       }
 
@@ -758,4 +762,5 @@ async function refreshTokenIfNeeded() {
     checkAuth();
   </script>
 </body>
+
 </html>

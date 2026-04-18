@@ -1,0 +1,28 @@
+stateDiagram-v2
+    direction TB
+
+    %% Component Blocks (using State nodes for the clean box look)
+    state "📦 UI_Layer (HTML/JS)" as UI
+    
+    state "🐍 Flask_Backend (App)" as Backend {
+        direction TB
+        state "🚪 Blueprints / Routes" as BP
+        state "⚙️ AI_Service_Layer" as SVC
+        state "📄 SQLAlchemy_Models" as MDL
+    }
+
+    state "🗄️ PostgreSQL_Database" as DB
+    state "🌐 Miraggio_AI_API" as Ext
+
+    %% Logical Connections
+    UI --> BP : REST / JSON
+    BP --> SVC : logic_call()
+    SVC --> Ext : requests.post()
+    BP --> MDL : db_query
+    MDL --> DB : psycopg2
+    
+    %% Professional Styling
+    style UI fill:#f9f9f9,stroke:#333,stroke-width:1.5px
+    style Backend fill:#ffffff,stroke:#333,stroke-width:2px
+    style DB fill:#eee,stroke:#333,stroke-width:2px
+    style Ext fill:#f0f4ff,stroke:#5c7cfa,stroke-width:1px

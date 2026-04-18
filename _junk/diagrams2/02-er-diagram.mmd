@@ -1,0 +1,76 @@
+erDiagram
+    USER {
+        long id PK
+        string userid UK
+        string password
+        string role
+    }
+    
+    USER_PROFILE {
+        long id PK
+        long user_id UK
+        string name
+        string email
+        string avatar
+        string gender
+        string preferred_style
+        string preferred_color
+        datetime created_at
+        datetime updated_at
+    }
+    
+    TRY_ON_HISTORY {
+        long id PK
+        long user_id FK
+        string human_image_url
+        string clothing_image_url
+        string result_image_url
+        string garment_type
+        string outfit_description
+        datetime created_at
+    }
+    
+    SAVED_OUTFIT {
+        long id PK
+        long user_id FK
+        string outfit_name
+        string outfit_description
+        string image_url
+        string style
+        string occasion
+        string gender
+        datetime created_at
+    }
+    
+    OUTFIT {
+        long id PK
+        long user_id FK
+        string outfit_name
+        string style
+        string occasion
+        string season
+        string gender
+        string color_preference
+        string top_description
+        string bottom_description
+        string shoes_description
+        string accessories_description
+        string image_url
+        boolean is_ai_generated
+        datetime created_at
+    }
+    
+    CONTACT_MESSAGE {
+        long id PK
+        string name
+        string email
+        string message
+        boolean is_read
+        datetime created_at
+    }
+    
+    USER ||--|| USER_PROFILE : "has"
+    USER ||--o{ TRY_ON_HISTORY : "generates"
+    USER ||--o{ SAVED_OUTFIT : "saves"
+    USER ||--o{ OUTFIT : "creates"
+
